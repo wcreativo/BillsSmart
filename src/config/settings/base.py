@@ -14,7 +14,7 @@ DJANGO_APPS = [
 
 LOCAL_APPS = ["apps.clients", "apps.products", "apps.bills", "apps.users"]
 
-THIRD_APPS = ["drf_spectacular"]
+THIRD_APPS = ["drf_spectacular", "rest_framework_simplejwt"]
 
 INSTALLED_APPS = DJANGO_APPS + LOCAL_APPS + THIRD_APPS
 
@@ -85,8 +85,14 @@ DEFAULT_AUTO_FIELD = "django.db.models.BigAutoField"
 
 AUTH_USER_MODEL = "users.User"
 
-AUTHENTICATION_BACKENDS = ["users.authentication.EmailBackend"]
+AUTHENTICATION_BACKENDS = ["apps.users.authentication.EmailBackend"]
 
 REST_FRAMEWORK = {
     "DEFAULT_SCHEMA_CLASS": "drf_spectacular.openapi.AutoSchema",
+    "DEFAULT_AUTHENTICATION_CLASSES": [
+        "rest_framework_simplejwt.authentication.JWTAuthentication",
+    ],
+}
+SIMPLE_JWT = {
+    "AUTH_HEADER_TYPES": ("Bearer",),
 }

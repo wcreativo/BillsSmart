@@ -2,8 +2,12 @@ from django.conf import settings
 from django.contrib import admin
 from django.urls import include, path
 
+from apps.users.views import LoginView, RegisterUserView
+
 urlpatterns = [
     path("admin/", admin.site.urls),
+    path("register/", RegisterUserView.as_view(), name="register"),
+    path("login/", LoginView.as_view(), name="login"),
 ]
 
 if settings.DEBUG:

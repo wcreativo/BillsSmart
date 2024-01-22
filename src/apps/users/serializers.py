@@ -5,24 +5,36 @@ from rest_framework import serializers
 User = get_user_model()
 
 
-class CustomUserSerializer(serializers.ModelSerializer):
-    class Meta:
-        model = User
-        fields = ("email", "password")
+class UserLoginSerializer(serializers.Serializer):
+    email = serializers.EmailField()
+    password = serializers.CharField()
 
     def validate(self, data):
-        email = data.get("email", None)
-        password = data.get("password", None)
+        email = data.get("email")
+        password = data.get("password")
 
-        if email is None or password is None:
-            raise serializers.ValidationError("Email and password are required fields.")
+        if email and password:
+            user = User.objects.filter(email=email).first()
 
-        user = authenticate(
-            request=self.context.get("request"), email=email, password=password
-        )
+            if user and user.check_password(password):
+                data["user"] = user
+            else:
+                raise serializers.ValidationError("Invalid email or password")
+        else:
+            raise serializers.ValidationError("Email and password are required")
 
-        if user is None:
-            raise serializers.ValidationError("Invalid email or password.")
-
-        data["user"] = user
         return data
+
+
+class UserRegistrationSerializer(serializers.ModelSerializer):
+    password = serializers.CharField(write_only=True)
+
+    class Meta:
+        model = User
+        fields = ["email", "password"]
+
+    def create(self, validated_data):
+        user = User.objects.create(email=validated_data["email"])
+        user.set_password(validated_data["password"])
+        user.save()
+        return user
