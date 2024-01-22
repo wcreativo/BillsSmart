@@ -10,6 +10,7 @@ urlpatterns = [
     path("register/", RegisterUserView.as_view(), name="register"),
     path("login/", LoginView.as_view(), name="login"),
     path("clients/", include("apps.clients.urls")),
+    path("products/", include("apps.products.urls")),
 ]
 
 if settings.DEBUG:
