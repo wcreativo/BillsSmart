@@ -1,19 +1,20 @@
 from rest_framework import serializers
+
 from .models import Product
 
 
 class ProductListSerializer(serializers.Serializer):
-    id = serializers.IntegerField()
+    id = serializers.IntegerField(read_only=True)
     name = serializers.CharField(max_length=255)
     description = serializers.CharField(max_length=255)
 
     def to_representation(self, instance):
         return {
-            'id': instance.id,
-            'name': instance.name,
-            'description': instance.description,
+            "id": instance.id,
+            "name": instance.name,
+            "description": instance.description,
         }
-    
+
 
 class ProductSerializer(serializers.Serializer):
     name = serializers.CharField(max_length=255)

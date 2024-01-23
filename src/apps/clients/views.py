@@ -4,13 +4,13 @@ from rest_framework.response import Response
 from rest_framework.views import APIView
 
 from apps.clients.models import Client
-from apps.clients.serializers import ClientListSerializer, ClientSerializer
+from apps.clients.serializers import ClientSerializer
 
 
 class ClientAPIView(APIView):
     def get(self, request):
         clients = Client.objects.all()
-        serializer = ClientListSerializer(clients, many=True)
+        serializer = ClientSerializer(clients, many=True)
         return Response(serializer.data, status=status.HTTP_200_OK)
 
     def post(self, request):
@@ -28,7 +28,7 @@ class ClientDetailAPIView(APIView):
             return Response(
                 {"error": "Client not found"}, status=status.HTTP_400_BAD_REQUEST
             )
-        serializer = ClientListSerializer(client)
+        serializer = ClientSerializer(client)
         return Response(serializer.data, status=status.HTTP_200_OK)
 
     def put(self, request, pk):

@@ -11,6 +11,7 @@ urlpatterns = [
     path("login/", LoginView.as_view(), name="login"),
     path("clients/", include("apps.clients.urls")),
     path("products/", include("apps.products.urls")),
+    path("bills/", include("apps.bills.urls")),
 ]
 
 if settings.DEBUG:

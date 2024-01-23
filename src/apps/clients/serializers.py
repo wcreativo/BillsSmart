@@ -3,28 +3,18 @@ from rest_framework import serializers
 from .models import Client
 
 
-class ClientListSerializer(serializers.Serializer):
-    id = serializers.IntegerField()
-    first_name = serializers.CharField(max_length=255)
-    last_name = serializers.CharField(max_length=255)
-    email = serializers.EmailField()
-    document = serializers.IntegerField(required=False, allow_null=True)
-
-    def to_representation(self, instance):
-        return {
-            "id": instance.id,
-            "first_name": instance.first_name,
-            "last_name": instance.last_name,
-            "email": instance.email,
-            "document": instance.document,
-        }
-
-
 class ClientSerializer(serializers.Serializer):
-    document = serializers.IntegerField(required=False, allow_null=True)
+    id = serializers.IntegerField(read_only=True)
+    document = serializers.IntegerField()
     first_name = serializers.CharField(max_length=255)
     last_name = serializers.CharField(max_length=255)
     email = serializers.EmailField()
+
+    def validate_email(self, value):
+        client = Client.objects.filter(email=value).first()
+        if client:
+            raise serializers.ValidationError("A client already exists with that email")
+        return value
 
     def create(self, validated_data):
         return Client.objects.create(**validated_data)
