@@ -1,3 +1,5 @@
+import asyncio
+
 from django.db.models import Q
 
 from apps.clients.models import Client
@@ -19,41 +21,55 @@ class ClientService:
             return data
         return None
 
-    @classmethod
-    def bulk_create_clients(cls, data):
-        try:
-            bulk_instances = []
-            for client in data:
-                bulk_instances.append(Client(**client))
-            Client.objects.bulk_create(bulk_instances)
-            return True
-        except Exception as e:
-            print(f"Error: {e}")
-            return False
 
-    @classmethod
-    def check_duplicate_data(cls, data):
-        unique_values = set()
+async def bulk_create_clients(data):
+    try:
+        bulk_instances = []
+        for client in data:
+            bulk_instances.append(Client(**client))
+        await asyncio.to_thread(Client.objects.bulk_create, bulk_instances)
+        return True
+    except Exception as e:
+        print(f"Error: {e}")
+        return False
 
-        list_without_duplicates = []
 
-        for dictionary in data:
-            document_value = dictionary.get("document")
-            email = dictionary.get("email")
+unique_values = set()
 
-            if document_value not in unique_values or email not in unique_values:
-                unique_values.add(document_value)
-                unique_values.add(email)
-                list_without_duplicates.append(dictionary)
 
-        return list_without_duplicates
+async def is_duplicate_data(client):
+    await asyncio.sleep(1)
 
-    @classmethod
-    def check_client_on_db(cls, data):
-        for i, dictionary in enumerate(data):
-            document = dictionary.get("document")
-            email = dictionary.get("email")
-            client = Client.objects.filter(Q(document=document) | Q(email=email))
-            if client:
-                data.remove(i)
-        return data
+    document = client["document"]
+    email = client["email"]
+    if document not in unique_values:
+        unique_values.add(document)
+        unique_values.add(email)
+        return client
+    return None
+
+
+async def is_client_on_db(client):
+    await asyncio.sleep(1)
+    document = client.get("document")
+    email = client.get("email")
+    client = Client.objects.filter(Q(document=document) | Q(email=email))
+    if client:
+        return None
+    return client
+
+
+async def check_clients(client):
+    client = await is_duplicate_data(client)
+    if client:
+        client = await is_client_on_db(client)
+        return client
+    else:
+        return None
+
+
+async def check_data_bulk_create(data):
+    data = await asyncio.gather(*(check_clients(client) for client in data))
+    clients_data = [client for client in data if client is not None]
+    bulk_result = await bulk_create_clients(clients_data)
+    return bulk_result

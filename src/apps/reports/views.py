@@ -1,3 +1,4 @@
+import asyncio
 import csv
 
 from django.http import HttpResponse
@@ -7,11 +8,11 @@ from rest_framework.views import APIView
 
 from apps.core.services import CSVExporter
 
-from .services import ClientService
+from .services import ClientService, check_data_bulk_create
 
 
 class ClientsReportView(APIView):
-    def get(self, request):
+    async def get(self, request):
         data = ClientService.total_bills_by_client()
         if data:
             field_names = ["document", "full_name", "total_bills"]
@@ -36,7 +37,7 @@ class ClientsReportView(APIView):
             status=status.HTTP_400_BAD_REQUEST,
         )
 
-    def post(self, request):
+    async def post(self, request):
         if "file" not in request.FILES:
             return Response(
                 {"error": "There is not a CSV file in the request."},
@@ -55,9 +56,7 @@ class ClientsReportView(APIView):
                 decoded_file = csv_file.read().decode("utf-8").splitlines()
                 csv_reader = csv.DictReader(decoded_file)
                 data = list(csv_reader)
-                data = ClientService.check_duplicate_data(data)
-                data = ClientService.check_client_on_db(data)
-                success_bulk: bool = ClientService.bulk_create_clients(data)
+                success_bulk = await asyncio.to_thread(check_data_bulk_create, data)
                 if success_bulk:
                     return Response(
                         {"message": "Bulk Create Clients Successfull"},
