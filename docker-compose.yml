@@ -1,0 +1,32 @@
+version: "3"
+
+services:
+  django-app:
+    env_file:
+      - .env
+    build:
+      context: .
+    container_name: django
+    ports:
+      - "8000:8000"
+    volumes:
+      - ./src:/src
+    command: >
+      sh -c "python manage.py wait_for_db &&
+             python manage.py migrate &&
+             python manage.py runserver 0.0.0.0:8000"
+    depends_on:
+      - db
+    networks:
+      - networkSmart
+
+  db:
+    image: postgres:12-alpine
+    container_name: smart-db
+    env_file:
+      - .env
+    networks:
+      - networkSmart
+
+networks:
+  networkSmart:

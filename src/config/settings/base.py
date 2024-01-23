@@ -22,7 +22,7 @@ LOCAL_APPS = [
     "apps.reports",
 ]
 
-THIRD_APPS = ["drf_spectacular", "rest_framework_simplejwt"]
+THIRD_APPS = ["drf_spectacular", "rest_framework_simplejwt", "pytest", "pytest-django"]
 
 INSTALLED_APPS = DJANGO_APPS + LOCAL_APPS + THIRD_APPS
 
