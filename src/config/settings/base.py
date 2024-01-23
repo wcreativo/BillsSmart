@@ -12,7 +12,14 @@ DJANGO_APPS = [
     "rest_framework",
 ]
 
-LOCAL_APPS = ["apps.clients", "apps.products", "apps.bills", "apps.users", "apps.core"]
+LOCAL_APPS = [
+    "apps.clients",
+    "apps.products",
+    "apps.bills",
+    "apps.users",
+    "apps.core",
+    "apps.reports",
+]
 
 THIRD_APPS = ["drf_spectacular", "rest_framework_simplejwt"]
 

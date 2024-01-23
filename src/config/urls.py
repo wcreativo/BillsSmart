@@ -12,6 +12,7 @@ urlpatterns = [
     path("clients/", include("apps.clients.urls")),
     path("products/", include("apps.products.urls")),
     path("bills/", include("apps.bills.urls")),
+    path("reports/", include("apps.reports.urls")),
 ]
 
 if settings.DEBUG:

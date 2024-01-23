@@ -6,7 +6,7 @@ from apps.products.models import Product
 
 
 class Bill(GenericModel):
-    client = models.ForeignKey(Client, on_delete=models.CASCADE)
+    client = models.ForeignKey(Client, on_delete=models.CASCADE, related_name="bills")
     company_name = models.CharField(max_length=255)
     nit = models.CharField(max_length=255)
     code = models.CharField(max_length=255)
